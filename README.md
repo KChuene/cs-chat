@@ -1,0 +1,1 @@
+An invite only basic messaging app following a Client-Server framework whereby the server is responsible for message forwarding to facilitate communication between the clients. Generating invitation keys and registering credentials is done with a simple PHP App.
