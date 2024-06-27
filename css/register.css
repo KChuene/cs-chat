@@ -1,0 +1,33 @@
+h1 {
+    font-size: 50px;
+    text-decoration: underline;
+}
+
+.field {
+    padding: 5px 7px;
+    margin-bottom: 5px;
+
+    color: rgb(154, 151, 151);
+    outline: none;
+
+    border-radius: 5px;
+
+    font-size: 25px;
+}
+
+#btn_submit {
+    padding: 5px 7px;
+
+    color: white;
+    background-color: rgb(26, 128, 26);
+    border-radius: 5px;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#btn_submit:hover {
+    background-color: rgb(8, 82, 8);
+}
