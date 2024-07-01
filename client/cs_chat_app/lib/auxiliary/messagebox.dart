@@ -1,7 +1,4 @@
-import 'dart:js_util';
-
 import 'package:cs_chat_app/model/message.dart';
-import 'package:flutter/material.dart';
 
 class MessageBox {
   List<Message> messages = [];
@@ -11,23 +8,11 @@ class MessageBox {
     return _instance;
   }
 
-  MessageBox._construct() {
-    messages.add(AuthMessage());
-  }
+  MessageBox._construct();
 
-  void add(String message) {
-    if(message.startsWith("<AUTH_OK>")) {
-      AuthMessage.isSuccess = true;
-    }
-    else if(message.startsWith("<AUTH_BAD>")) {
-      AuthMessage.isSuccess = false;
-    }
-    else {
-      
-    }
-  }
+  void add(Message message) => messages.add(message);
 
-  bool auth_status() {
-    return AuthMessage.isSuccess;
-  } 
+  Message get(int index) => messages[(index >= 0 && index < messages.length)? index : 0];
+
+  Message last() => messages.removeLast();
 }

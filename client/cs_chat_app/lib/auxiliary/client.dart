@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -15,69 +16,48 @@ class Client {
   Client({required this.host, required this.port});
 
   Future<void> connect() async {
-    socket = await Socket.connect("127.0.0.1", 178);
+    socket = await Socket.connect(host, port);
     print("Connected to ${socket!.remoteAddress.address}:${socket!.port}.");
 
     print("Listening for messages");
     socket?.listen(
       (Uint8List data) { 
-        TextMessage message = data as TextMessage;
-        msgBox.add(message);
+        Map<String, dynamic> jsonObj = json.decode(String.fromCharCodes(data));
+        Message msg = Message.fromJson(jsonObj);
+
+        if(msg.type == MsgType.auth) {
+          AuthResponse.setFromJson(jsonObj);
+        }
+        else {
+          msgBox.add(TextMessage.fromJson(jsonObj));
+        }
       },
       onError: (error) {
-        if(error.toString().length <= 25) {
-          print(error);
-        }
-        else msgBox.add("");
+        msgBox.add(TextMessage(
+          type: MsgType.error,
+          text: error,
+          dtSent: DateTime.now(), // Not used in later evaluation
+          isFromMe: false // Not used in later evaluation
+        ));
       },
       onDone: () {
-        print("[!] Server disconnected.");
+        msgBox.add(TextMessage(
+          type: MsgType.info,
+          text: "Server disconnected.",
+          dtSent: DateTime.now(), // Not used in later evaluation
+          isFromMe: false // Not used in later evaluation
+        )); 
         socket?.destroy();
       }
     );
   }
 
-  Future<bool> auth(String uname, String pword) async {
+  Future<void> auth(AuthRequest request) async {
     print("Attempting to authenticate");
-    if(socket != null) {
-    socket!.write("<AUTH>.$uname.$pword");
-    Uint8List l = await socket!.first;
-    String success = String.fromCharCodes(l);
-    print("Auth attempt result $success");
-    if(success.startsWith("<OK>.")) {
-      print("Authenticated.");
-      return true;
-    }
-    }
-    print("Didn't authenticate.");
-    return false;
-
-
+    socket?.write(json.encode(request));
   }
 
-  Future<void> listen() async {
-
-  }
-
-  void send(String msg) async {
-    socket!.write(msg);
-  }
-}
-
-void main() async {
-  final cli = Client(host: "127.0.0.1", port: 178);
-  await cli.connect();
-  print("Next authentication");
-
-  bool isauth = await cli.auth("wiener", "026ad9b14a7453b7488daa0c6acbc258b1506f52c441c7c465474c1a564394ff");
-  if(isauth) {
-    cli.listen();
-
-    String? message = "";
-    do {
-      print("<message> ~\$ ");
-      message = stdin.readLineSync();
-      cli.send(message.toString());
-    }while(message==null || message.isEmpty && message!="x");
+  void send(TextMessage msg) async {
+    socket?.write(json.encode(msg));
   }
 }

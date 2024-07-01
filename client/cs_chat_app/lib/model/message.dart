@@ -1,29 +1,28 @@
-import 'package:flutter/material.dart';
+enum MsgType { auth, normal, error, info }
 
-enum MsgType { auth, text }
-
-abstract class Message {
+class Message {
   MsgType type;
 
+
   Message({
-    this.type = MsgType.auth
+    this.type = MsgType.auth,
   });
 
-  Message fromJson(Map<String, dynamic> json);
-  Map<String, dynamic> toJson();
+  Message.fromJson(Map<String, dynamic> json) 
+    : type = json["type"] as MsgType;
 }
 
 class TextMessage extends Message {
-
-  String text;
-  bool isFromMe;
-  DateTime dtSent;
+  String? text;
+  bool? isFromMe;
+  DateTime? dtSent;
 
   TextMessage({
     required this.dtSent,
-    required this.text,
-    required this.isFromMe
-  }):super(type: MsgType.text);
+    required this.isFromMe,
+    super.type,
+    required text
+  });
 
   static List<TextMessage> list() {
     return [
@@ -35,10 +34,51 @@ class TextMessage extends Message {
       TextMessage(text: "You bet!!", dtSent: DateTime.now(), isFromMe: false)
     ];
   }
+  
+  TextMessage.fromJson(Map<String, dynamic> json) {
+    type = json["type"] as MsgType;
+    text = json["text"] as String;
+    isFromMe = false;
+    dtSent = json["date"] as DateTime;
+  }
+    
+  Map<String, dynamic> toJson() => {
+    "type": type,
+    "text": text,
+    "isFromMe": isFromMe,
+    "date": dtSent
+  };
 }
 
-class AuthMessage extends Message {
+class AuthResponse extends Message {
   static bool isSuccess = false;
-  
-  AuthMessage() : super(type: MsgType.auth);
+  static String text = "";
+
+  static setFromJson(Map<String, dynamic> json)  {
+    isSuccess = json["isSuccess"] as bool;
+    text = json["message"] as String;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "type": type,
+      "isSuccess": isSuccess,
+      "message": text
+    };
+  }
+}
+
+class AuthRequest extends Message {
+  String uname;
+  String pword;
+
+  AuthRequest({
+    required this.uname,
+    required this.pword
+  });
+
+  Map<String, dynamic> toJson() => {
+    "uname": uname,
+    "pword": pword
+  };
 }

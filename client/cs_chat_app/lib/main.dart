@@ -15,7 +15,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: LoginScreen()
+      routes: {
+        LoginScreen.route: (_) => LoginScreen(),
+        ChatScreen.route: (_) => ChatScreen()
+      },
     );
   }
 }

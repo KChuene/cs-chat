@@ -1,6 +1,13 @@
+import 'package:cs_chat_app/auxiliary/messaging.dart';
+import 'package:cs_chat_app/model/message.dart';
+import 'package:cs_chat_app/screens/chat.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
+  static const String route = "/";
+
+  TextEditingController txtUName = TextEditingController();
+  TextEditingController txtPWord = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +75,7 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {}, 
+                onPressed: () => _login(context), 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -87,5 +94,20 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _login(BuildContext context) {
+    Messaging client = Messaging();
+    bool success = client.auth(
+      txtUName.text, 
+      txtPWord.text
+    );
+
+    if(success) {
+      Navigator.of(context).pushNamed(ChatScreen.route);
+    }
+    else {
+      print("Aunthentication failed. ${AuthResponse.text}");
+    }
   }
 }
