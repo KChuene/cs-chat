@@ -1,3 +1,4 @@
+import 'package:cs_chat_app/widgets/chart_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:cs_chat_app/model/message.dart';
 
@@ -7,7 +8,8 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  List<Message> messages = Message.list();
+  List<TextMessage> messages = TextMessage.list();
+  TextEditingController messageEditController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +19,15 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: [
             Expanded(
-              child: Column(
-                children: [
-                  for(Message message in messages) 
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(color: (message.isFromMe)? Colors.green : Color.fromARGB(255, 48, 47, 47)),
-                      alignment: (message.isFromMe)? Alignment.centerRight : Alignment.centerLeft,
-                      child: Text(
-                        message.text.toString(),
-                        style: TextStyle(
-                          color: Colors.white
-                        )
-                      )
-                    )
-                ],
-              ),
+              child: ListView.builder(
+                itemCount: messages.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final TextMessage currMessage = messages[index];
+                  return ChatBubble(
+                    message: currMessage
+                  );
+                }
+              )
             ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -49,17 +44,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         )],
                         borderRadius: BorderRadius.circular(25)
                       ),
-                      child: const TextField(
-                        decoration: InputDecoration(
+                      child: TextField(
+                        decoration: const InputDecoration(
                           hintText: "Message",
                           border: InputBorder.none
                         ),
+                        controller: messageEditController,
                       ),
                     ),
                   ),
                   SizedBox(width: 15),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => addMessage(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       minimumSize: Size(60, 60),
@@ -77,5 +73,15 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  void addMessage() {
+    if(messageEditController.text.trim().isNotEmpty) {
+      setState(() {
+        messages.add(
+          TextMessage(text: messageEditController.text, dtSent: DateTime.now(), isFromMe: true)
+        );
+      });
+    }
   }
 }

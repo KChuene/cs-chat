@@ -1,5 +1,6 @@
+import 'package:cs_chat_app/screens/chat.dart';
+import 'package:cs_chat_app/screens/login.dart';
 import 'package:flutter/material.dart';
-import 'package:cs_chat_app/screens/chat_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: ChatScreen()
+      home: LoginScreen()
     );
   }
 }

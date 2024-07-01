@@ -1,5 +1,6 @@
 import threading
 import socket
+import sys
 
 def connect(host : str, port : int):
     try:
@@ -17,14 +18,20 @@ def connect(host : str, port : int):
     send_messages(sock)
 
 def recv_messages(sock : socket.SocketType):
-    while cont_exec:
-        in_msg = sock.recv(1024)
+    global cont_exec
+    try: 
+        while cont_exec:
+            in_msg = sock.recv(1024)
 
-        if in_msg.strip():
-            print(f"\r{' '*len(prompt_txt)}\n{in_msg.decode('utf-8')}\n")
-            print(f"{prompt_txt}", end="", flush=True)
+            if in_msg.strip():
+                print(f"\r{' '*len(prompt_txt)}\n{in_msg.decode('utf-8')}\n")
+                print(f"{prompt_txt}", end="", flush=True)
 
-    return
+        return
+    except ConnectionResetError:
+        print("\n[!] Server disconnected.")
+        sock.close()
+        cont_exec = False
 
 def send_messages(sock : socket.SocketType):
     global cont_exec
