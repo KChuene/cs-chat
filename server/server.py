@@ -88,6 +88,7 @@ def recv_msgs(conn : socket.socket):
         try:
             msg = conn.recv(1024)
             print(f"[i] New message from {conn.getpeername()}.")
+            print(msg.decode("utf-8"))
 
             if is_auth_req(msg):
                 auth(conn, msg)

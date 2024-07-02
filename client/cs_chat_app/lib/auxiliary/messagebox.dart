@@ -12,7 +12,8 @@ class MessageBox {
 
   void add(Message message) => messages.add(message);
 
-  Message get(int index) => messages[(index >= 0 && index < messages.length)? index : 0];
+  Message get(int index) => 
+    messages[(index >= 0 && index < messages.length)? index : 0];
 
   Message last() => messages.removeLast();
 }

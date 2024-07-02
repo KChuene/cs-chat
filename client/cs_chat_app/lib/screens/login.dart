@@ -1,4 +1,4 @@
-import 'package:cs_chat_app/auxiliary/messaging.dart';
+import 'package:cs_chat_app/auxiliary/messenger.dart';
 import 'package:cs_chat_app/model/message.dart';
 import 'package:cs_chat_app/screens/chat.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 class LoginScreen extends StatelessWidget {
   static const String route = "/";
 
-  TextEditingController txtUName = TextEditingController();
-  TextEditingController txtPWord = TextEditingController();
+  TextEditingController txtUsername = TextEditingController();
+  TextEditingController txtPassword = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +42,7 @@ class LoginScreen extends StatelessWidget {
                   )]
                 ),
                 child: TextField(
+                  controller: txtUsername,
                   decoration: InputDecoration(
                     hintText: "Username",
                     hintStyle: TextStyle(color: Colors.grey),
@@ -64,6 +65,7 @@ class LoginScreen extends StatelessWidget {
                   )]
                 ),
                 child: TextField(
+                  controller: txtPassword,
                   decoration: InputDecoration(
                     hintText: "Password",
                     hintStyle: TextStyle(color: Colors.grey),
@@ -96,18 +98,16 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void _login(BuildContext context) {
-    Messaging client = Messaging();
-    bool success = client.auth(
-      txtUName.text, 
-      txtPWord.text
-    );
+  void _login(BuildContext context) async {
+    Messenger messenger = await Messenger.create();
 
+    print("Username: ${txtUsername.text}, Password: ${txtPassword.text}");
+    bool success = await messenger.auth(txtUsername.text, txtPassword.text);
     if(success) {
       Navigator.of(context).pushNamed(ChatScreen.route);
     }
     else {
-      print("Aunthentication failed. ${AuthResponse.text}");
+      print("Aunthentication failed. ${AuthStatus.text}");
     }
   }
 }

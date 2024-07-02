@@ -2,26 +2,33 @@ import 'package:cs_chat_app/auxiliary/client.dart';
 import 'package:cs_chat_app/auxiliary/messagebox.dart';
 import 'package:cs_chat_app/model/message.dart';
 
-class Messaging {
+class Messenger {
   Client? _client;
   MessageBox? _messages;
-  static final Messaging _instance = Messaging._construct();
-
-  factory Messaging() {
-    return _instance;
-  }
+  static Messenger? _instance;
   
-  Messaging._construct() {
+  Messenger._construct() {
     _client = Client(host: "127.0.0.1", port: 178);
     _messages = MessageBox();
 
     _client?.connect();
   }
 
-  bool auth(String uname, String pword) {
-    _client?.auth(AuthRequest(uname: uname, pword: pword));
+  static Future<Messenger> create() async {
+    _instance ??= Messenger._construct();
 
-    return AuthResponse.isSuccess;
+    return _instance as Messenger;
+  }
+
+  Future<bool> auth(String uname, String pword) async {
+    await _client?.auth(AuthRequest(uname: uname, pword: pword));
+
+    if(!AuthStatus.isReceived) {
+      AuthStatus.text = "Authentication timed out.";
+      return false;
+    }
+
+    return AuthStatus.isSuccess;
   }
 
   void send(String text) {

@@ -12,7 +12,6 @@ class Client {
   Socket? socket;
   MessageBox msgBox = MessageBox();
 
-
   Client({required this.host, required this.port});
 
   Future<void> connect() async {
@@ -26,35 +25,48 @@ class Client {
         Message msg = Message.fromJson(jsonObj);
 
         if(msg.type == MsgType.auth) {
-          AuthResponse.setFromJson(jsonObj);
+          AuthStatus.isReceived = true;
+          AuthStatus.setFromJson(jsonObj);
         }
         else {
           msgBox.add(TextMessage.fromJson(jsonObj));
         }
       },
       onError: (error) {
-        msgBox.add(TextMessage(
-          type: MsgType.error,
-          text: error,
-          dtSent: DateTime.now(), // Not used in later evaluation
-          isFromMe: false // Not used in later evaluation
-        ));
+        // Pass errors to AuthStatus if not authenticated else add to MessageBox
+        if(AuthStatus.isSuccess) {
+          msgBox.add(Notice(
+            type: MsgType.error,
+            text: error
+          ));
+        }
+        else {
+          AuthStatus.text = error;
+        }
       },
       onDone: () {
-        msgBox.add(TextMessage(
-          type: MsgType.info,
-          text: "Server disconnected.",
-          dtSent: DateTime.now(), // Not used in later evaluation
-          isFromMe: false // Not used in later evaluation
-        )); 
+        // Pass errors to AuthStatus if not authenticated else add to MessageBox
+        if(AuthStatus.isSuccess) {
+          msgBox.add(Notice(
+            type: MsgType.end,
+            text: "Server disconnected.",
+          )); 
+        }
+        else {
+          AuthStatus.text = "Server disconnected.";
+        }
         socket?.destroy();
       }
     );
   }
 
-  Future<void> auth(AuthRequest request) async {
+  Future<void> auth(AuthRequest request) {
     print("Attempting to authenticate");
-    socket?.write(json.encode(request));
+    
+    return Future.delayed(Duration(seconds: 10), () {
+      AuthStatus.isReceived = false;
+      socket?.write(json.encode(request));
+    });
   }
 
   void send(TextMessage msg) async {

@@ -1,8 +1,12 @@
-enum MsgType { auth, normal, error, info }
+enum MsgType { 
+  auth, 
+  normal, 
+  error, 
+  end 
+}
 
 class Message {
   MsgType type;
-
 
   Message({
     this.type = MsgType.auth,
@@ -50,7 +54,8 @@ class TextMessage extends Message {
   };
 }
 
-class AuthResponse extends Message {
+class AuthStatus extends Message {
+  static bool isReceived = false;
   static bool isSuccess = false;
   static String text = "";
 
@@ -81,4 +86,10 @@ class AuthRequest extends Message {
     "uname": uname,
     "pword": pword
   };
+}
+
+class Notice extends Message {
+  String text;
+
+  Notice({required this.text, super.type});
 }
