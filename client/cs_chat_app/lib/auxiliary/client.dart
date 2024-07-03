@@ -27,6 +27,7 @@ class Client {
         if(msg.type == MsgType.auth) {
           AuthStatus.isReceived = true;
           AuthStatus.setFromJson(jsonObj);
+          print("Auth status: ${AuthStatus.isSuccess}, message: ${AuthStatus.text}");
         }
         else {
           msgBox.add(TextMessage.fromJson(jsonObj));
@@ -56,16 +57,21 @@ class Client {
           AuthStatus.text = "Server disconnected.";
         }
         socket?.destroy();
+        socket = null;
       }
     );
   }
 
-  Future<void> auth(AuthRequest request) {
+  bool disconnected() {
+    return socket == null;
+  }
+
+  Future<void> auth(AuthRequest request) async {
     print("Attempting to authenticate");
     
     return Future.delayed(Duration(seconds: 10), () {
       AuthStatus.isReceived = false;
-      socket?.write(json.encode(request));
+      socket?.write(json.encode(request.toJson()));
     });
   }
 

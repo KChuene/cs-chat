@@ -1,7 +1,8 @@
 import socket
 import threading
-import os
+import json
 
+from model import *
 from pathlib import Path
 
 class Connection:
@@ -32,7 +33,7 @@ def check_authfile(uname : str, pword : str):
                 continue # Malformed credentials
 
             elif creds[0] == uname and creds[1] == pword:
-                return True, None
+                return True, "Welcome!"
             
             line = authfile.readline()
         
@@ -48,23 +49,24 @@ def update_auth_status(sock : socket.SocketType, is_auth: bool):
     print(f"[!] Failed to update auth status of {conn.sock.getpeername()}")
 
 
-def auth(conn : socket.SocketType, msg : bytes):
-    # Auth Request Format: <AUTH>.username.password
-    tokens = msg.decode("utf-8").replace("\n","").split(".")
-    if len(tokens) != 3:
-        conn.send(str.encode("<BAD>.Malformed auth string."))
+def auth(conn : socket.SocketType, req : dict):
+    if not req.get("uname") or not req.get("pword"):
+        status = AuthStatus(False, "Incomplete authentication request.")
+        conn.send(str.encode( json.dumps(status.dict()) ))
         return
 
-    authentic, res_msg = check_authfile(uname= tokens[1], pword= tokens[2])
+    authentic, res_msg = check_authfile(uname= req.get("uname"), pword= req.get("pword"))
     if authentic:
         update_auth_status(conn, True)
-        conn.send(str.encode(f"<AUTH_OK>.{res_msg}"))
+        status = AuthStatus(True, res_msg)
+        conn.send(str.encode( json.dumps(status.dict()) ))
     else:
-        conn.send(str.encode(f"<AUTH_BAD>.{res_msg}"))
+        status = AuthStatus(False, res_msg)
+        conn.send(str.encode( json.dumps(status.dict()) ))
     
 
-def is_auth_req(msg : bytes):
-    return msg.decode("utf-8").startswith("<AUTH>")
+def is_auth_req(msg_obj : dict):
+    return isinstance(msg_obj, dict) and msg_obj.get("type") == MsgType.auth.name
 
 def is_auth_conn(sock : socket.SocketType):
     for conn in connections:
@@ -90,8 +92,9 @@ def recv_msgs(conn : socket.socket):
             print(f"[i] New message from {conn.getpeername()}.")
             print(msg.decode("utf-8"))
 
-            if is_auth_req(msg):
-                auth(conn, msg)
+            jsonObj = json.loads(msg)
+            if is_auth_req(jsonObj):
+                auth(conn, jsonObj)
 
             elif is_auth_conn(conn):
                 forward(msg)

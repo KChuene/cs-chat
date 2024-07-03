@@ -21,6 +21,7 @@ class Messenger {
   }
 
   Future<bool> auth(String uname, String pword) async {
+    reconnect_ex();
     await _client?.auth(AuthRequest(uname: uname, pword: pword));
 
     if(!AuthStatus.isReceived) {
@@ -32,6 +33,7 @@ class Messenger {
   }
 
   void send(String text) {
+    reconnect_ex();
     _client?.send(
       TextMessage(
         type: MsgType.normal,
@@ -40,5 +42,11 @@ class Messenger {
         isFromMe: true
       )
     );
+  }
+
+  void reconnect_ex() async {
+    if(_client!.disconnected()) {
+      await _client?.connect();
+    }
   }
 }

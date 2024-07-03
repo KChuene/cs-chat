@@ -2,7 +2,8 @@ enum MsgType {
   auth, 
   normal, 
   error, 
-  end 
+  end,
+  none
 }
 
 class Message {
@@ -13,7 +14,8 @@ class Message {
   });
 
   Message.fromJson(Map<String, dynamic> json) 
-    : type = json["type"] as MsgType;
+    : type = MsgType.values.firstWhere((t) => t.name == json["type"]);
+
 }
 
 class TextMessage extends Message {
@@ -47,7 +49,7 @@ class TextMessage extends Message {
   }
     
   Map<String, dynamic> toJson() => {
-    "type": type,
+    "type": type.name,
     "text": text,
     "isFromMe": isFromMe,
     "date": dtSent
@@ -61,12 +63,12 @@ class AuthStatus extends Message {
 
   static setFromJson(Map<String, dynamic> json)  {
     isSuccess = json["isSuccess"] as bool;
-    text = json["message"] as String;
+    text = json["text"] as String;
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "type": type,
+      "type": type.name,
       "isSuccess": isSuccess,
       "message": text
     };
@@ -83,6 +85,7 @@ class AuthRequest extends Message {
   });
 
   Map<String, dynamic> toJson() => {
+    "type": type.name,
     "uname": uname,
     "pword": pword
   };
