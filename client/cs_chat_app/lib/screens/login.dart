@@ -1,16 +1,21 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:cs_chat_app/auxiliary/messenger.dart';
+import 'package:cs_chat_app/auxiliary/navigatorservice.dart';
 import 'package:cs_chat_app/model/message.dart';
+import 'package:cs_chat_app/model/subscriber.dart';
 import 'package:cs_chat_app/screens/chat.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatelessWidget implements MessengerSubscriber {
   static const String route = "/";
 
   TextEditingController txtUsername = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
+  BuildContext? context;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     return Scaffold(
       body: Container(
         constraints: BoxConstraints(minWidth: 500),
@@ -77,13 +82,13 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () => _login(context), 
+                onPressed: () => _login(), 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   padding: EdgeInsets.symmetric(horizontal: 70, vertical: 15)
                 ),
-                child: Text(
+                child: const Text(
                   "Login",
                   style: TextStyle(
                     color: Colors.white,
@@ -98,16 +103,22 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void _login(BuildContext context) async {
-    Messenger messenger = await Messenger.create();
-
-    print("Username: ${txtUsername.text}, Password: ${txtPassword.text}");
-    bool success = await messenger.auth(txtUsername.text, txtPassword.text);
-    if(success) {
-      Navigator.of(context).pushNamed(ChatScreen.route);
-    }
-    else {
-      print("Aunthentication failed. ${AuthStatus.text}");
+  void _login() async {
+    Messenger messenger = await Messenger.getInstance();
+    var pwordBytes = utf8.encode(txtPassword.text);
+    messenger.auth(txtUsername.text, sha256.convert(pwordBytes).toString());
+    messenger.subscribe(this);
+  }
+  
+  @override
+  void handleMessage(Message message) {
+    print("I have been called.");
+    if(message.type == MsgType.auth) {
+      if(AuthStatus.isSuccess) {
+        Navigator
+        .of(NavigatorService.navigatorKey.currentContext!)
+        .pushNamed(ChatScreen.route);
+      }
     }
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cs_chat_app/auxiliary/messagebox.dart';
+import 'package:cs_chat_app/auxiliary/messenger.dart';
 import 'package:cs_chat_app/model/message.dart';
 
 class Client {
@@ -20,21 +21,15 @@ class Client {
 
     print("Listening for messages");
     socket?.listen(
-      (Uint8List data) { 
+      (Uint8List data) async { 
         Map<String, dynamic> jsonObj = json.decode(String.fromCharCodes(data));
-        Message msg = Message.fromJson(jsonObj);
-
-        if(msg.type == MsgType.auth) {
-          AuthStatus.isReceived = true;
-          AuthStatus.setFromJson(jsonObj);
-          print("Auth status: ${AuthStatus.isSuccess}, message: ${AuthStatus.text}");
-        }
-        else {
-          msgBox.add(TextMessage.fromJson(jsonObj));
-        }
+        
+        Messenger messenger = await Messenger.getInstance();
+        messenger.handleMessage(jsonObj);
       },
       onError: (error) {
         // Pass errors to AuthStatus if not authenticated else add to MessageBox
+        print("Error occured: $error");
         if(AuthStatus.isSuccess) {
           msgBox.add(Notice(
             type: MsgType.error,
@@ -66,13 +61,10 @@ class Client {
     return socket == null;
   }
 
-  Future<void> auth(AuthRequest request) async {
+  void auth(AuthRequest request) {
     print("Attempting to authenticate");
-    
-    return Future.delayed(Duration(seconds: 10), () {
-      AuthStatus.isReceived = false;
-      socket?.write(json.encode(request.toJson()));
-    });
+    AuthStatus.isReceived = false;
+    socket?.write(json.encode(request.toJson()));
   }
 
   void send(TextMessage msg) async {

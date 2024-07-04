@@ -1,3 +1,4 @@
+import 'package:cs_chat_app/auxiliary/navigatorservice.dart';
 import 'package:cs_chat_app/screens/chat.dart';
 import 'package:cs_chat_app/screens/login.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: NavigatorService.navigatorKey,
       title: 'Flutter Demo',
       routes: {
         LoginScreen.route: (_) => LoginScreen(),
