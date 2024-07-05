@@ -20,15 +20,15 @@ class Message {
 }
 
 class TextMessage extends Message {
-  String? text;
+  String text = "";
   bool? isFromMe;
   DateTime? dtSent;
 
   TextMessage({
+    required this.text,
     required this.dtSent,
     required this.isFromMe,
-    super.type,
-    required text
+    super.type
   });
 
   static List<TextMessage> list() {

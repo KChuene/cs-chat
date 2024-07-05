@@ -7,13 +7,21 @@ import 'package:cs_chat_app/model/subscriber.dart';
 import 'package:cs_chat_app/screens/chat.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget implements MessengerSubscriber {
+class LoginScreen extends StatefulWidget {
   static const String route = "/";
+
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> implements MessengerSubscriber {
 
   TextEditingController txtUsername = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
-  BuildContext? context;
-
+  Text status = const Text("");
+    
   @override
   Widget build(context) {
     return Scaffold(
@@ -47,6 +55,7 @@ class LoginScreen extends StatelessWidget implements MessengerSubscriber {
                   )]
                 ),
                 child: TextField(
+                  onTap: () => _clearWarnings(),
                   controller: txtUsername,
                   decoration: InputDecoration(
                     hintText: "Username",
@@ -70,6 +79,7 @@ class LoginScreen extends StatelessWidget implements MessengerSubscriber {
                   )]
                 ),
                 child: TextField(
+                  onTap: () => _clearWarnings(),
                   controller: txtPassword,
                   decoration: InputDecoration(
                     hintText: "Password",
@@ -81,6 +91,7 @@ class LoginScreen extends StatelessWidget implements MessengerSubscriber {
                 ),
               ),
               SizedBox(height: 20),
+              Container(child: status),
               ElevatedButton(
                 onPressed: () => _login(), 
                 style: ElevatedButton.styleFrom(
@@ -103,13 +114,6 @@ class LoginScreen extends StatelessWidget implements MessengerSubscriber {
     );
   }
 
-  void _login() async {
-    Messenger messenger = await Messenger.getInstance();
-    var pwordBytes = utf8.encode(txtPassword.text);
-    messenger.auth(txtUsername.text, sha256.convert(pwordBytes).toString());
-    messenger.subscribe(this);
-  }
-  
   @override
   void handleMessage(Message message) {
     print("I have been called.");
@@ -119,6 +123,44 @@ class LoginScreen extends StatelessWidget implements MessengerSubscriber {
         .of(NavigatorService.navigatorKey.currentContext!)
         .pushNamed(ChatScreen.route);
       }
+      else {
+        setState(() { 
+          status = Text(
+            AuthStatus.text,
+            style: const TextStyle(
+              color: Colors.red,
+              fontSize: 10,
+              fontWeight: FontWeight.w100
+            ),
+          );
+        });
+      }
     }
   }
+
+  void _login() async {
+    if(txtUsername.text.trim().isEmpty || txtPassword.text.trim().isEmpty) {
+      setState(() {
+        status = Text(
+          "All input fields are required.",
+          style: const TextStyle(
+            color: Colors.red,
+            fontSize: 10,
+            fontWeight: FontWeight.w100
+          ),
+        );
+      });
+    }
+    Messenger messenger = await Messenger.getInstance();
+    var pwordBytes = utf8.encode(txtPassword.text);
+    messenger.auth(txtUsername.text, sha256.convert(pwordBytes).toString());
+    messenger.subscribe(this);
+  }
+
+  void _clearWarnings() {
+    setState(() {
+      status = const Text("");
+    });
+  }
+  
 }

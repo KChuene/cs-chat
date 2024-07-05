@@ -54,6 +54,26 @@ class Messenger {
     }
   }
 
+  void handleNotice(MsgType type, String notice) {
+    switch(type) {
+      case MsgType.error:
+      case MsgType.end: {
+        if(AuthStatus.isSuccess) {
+          _messages?.add(Notice(
+            type: type,
+            text: notice,
+          ));
+        }
+        else {
+          AuthStatus.text = notice;
+        }
+        break;
+      }
+      default: 
+        return; // drop
+    }
+  }
+
   void auth(String uname, String pword) async {
     reconnect_ex();
     _client?.auth(

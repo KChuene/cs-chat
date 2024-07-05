@@ -1,6 +1,27 @@
 import threading
 import socket
+import json
 import sys
+
+from hashlib import sha256
+from cli_model import *
+from datetime import datetime
+
+def auth_usage():
+    print("Enter auth.login to initiate login.")
+
+def is_auth_stat(msg : dict):
+    return isinstance(msg, dict) and msg.get("type") == MsgType.auth.name
+
+def is_txt_msg(msg : dict):
+    return isinstance(msg, dict) and msg.get("type") == MsgType.normal.name
+
+def login() -> AuthRequest:
+    uname = input("Username: ").strip()
+    pword = input("Password: ").strip()
+
+    if uname and pword:
+        return AuthRequest(uname, sha256(str.encode(pword)).hexdigest())
 
 def connect(host : str, port : int):
     try:
@@ -9,7 +30,7 @@ def connect(host : str, port : int):
         print(f"[+] Connected to {sock.getpeername()}")
 
     except Exception:
-        print(f"[!] Error connecting to server at {sock.getpeername()}")
+        print(f"[!] Error connecting to server at {host}:{port}")
         exit()
 
     new_msg_receiver = threading.Thread(target=recv_messages, args=(sock,))
@@ -22,9 +43,14 @@ def recv_messages(sock : socket.SocketType):
     try: 
         while cont_exec:
             in_msg = sock.recv(1024)
+            
+            jsonObj = json.loads(in_msg)
+            if is_auth_stat(jsonObj):
+                print(f"\r{' '*len(prompt_txt)}\n{jsonObj['text']}\n")
+                print(f"{prompt_txt}", end="", flush=True)
 
-            if in_msg.strip():
-                print(f"\r{' '*len(prompt_txt)}\n{in_msg.decode('utf-8')}\n")
+            elif is_txt_msg(jsonObj):
+                print(f"\r{' '*len(prompt_txt)}\n{jsonObj['text']}\n")
                 print(f"{prompt_txt}", end="", flush=True)
 
         return
@@ -36,17 +62,25 @@ def recv_messages(sock : socket.SocketType):
 def send_messages(sock : socket.SocketType):
     global cont_exec
     try:
+        auth_usage()
         print(prompt_txt, end="")
         while cont_exec:
             out_msg = input().strip()
-            out_msg += "\n"
 
-            if out_msg:
-                sock.send(str.encode(out_msg))
+            if out_msg == "auth.login":
+                auth_req = login()
+
+                if auth_req:
+                    sock.send(str.encode( json.dumps(auth_req.dict()) ))
+
+            elif out_msg:
+                text_msg = TextMessage(out_msg, str(datetime.now()))
+                sock.send(str.encode( json.dumps(text_msg.dict()) ))
 
     except KeyboardInterrupt:
         cont_exec = False
         print("\n[i] Bye bye.")
+        sys.exit()
 
 cont_exec = True
 prompt_txt = "(message)~$ "

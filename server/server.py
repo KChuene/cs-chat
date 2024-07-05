@@ -2,7 +2,7 @@ import socket
 import threading
 import json
 
-from model import *
+from svr_model import *
 from pathlib import Path
 
 class Connection:
@@ -99,7 +99,8 @@ def recv_msgs(conn : socket.socket):
             elif is_auth_conn(conn):
                 forward(msg)
             else:
-                conn.send(str.encode("Not authenticated."))
+                status = AuthStatus(False, "Not authenticated.")
+                conn.send(str.encode( json.dumps(status.dict()) ))
 
         except ConnectionResetError:
             close_conn(conn)

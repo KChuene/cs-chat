@@ -27,30 +27,18 @@ class Client {
         Messenger messenger = await Messenger.getInstance();
         messenger.handleMessage(jsonObj);
       },
-      onError: (error) {
+      onError: (error) async {
         // Pass errors to AuthStatus if not authenticated else add to MessageBox
         print("Error occured: $error");
-        if(AuthStatus.isSuccess) {
-          msgBox.add(Notice(
-            type: MsgType.error,
-            text: error
-          ));
-        }
-        else {
-          AuthStatus.text = error;
-        }
+        
+        Messenger messenger = await Messenger.getInstance();
+        messenger.handleNotice(MsgType.error, error ); // Change to 'Internal server error. Try again later'
       },
-      onDone: () {
+      onDone: () async {
         // Pass errors to AuthStatus if not authenticated else add to MessageBox
-        if(AuthStatus.isSuccess) {
-          msgBox.add(Notice(
-            type: MsgType.end,
-            text: "Server disconnected.",
-          )); 
-        }
-        else {
-          AuthStatus.text = "Server disconnected.";
-        }
+        Messenger messenger = await Messenger.getInstance();
+        messenger.handleNotice(MsgType.end, "Server disconnected");
+
         socket?.destroy();
         socket = null;
       }
