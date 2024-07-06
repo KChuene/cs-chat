@@ -74,6 +74,8 @@ def send_messages(sock : socket.SocketType):
                 text_msg = TextMessage(out_msg, str(datetime.now()))
                 sock.send(str.encode( json.dumps(text_msg.dict()) ))
 
+            print(prompt_txt, end="")
+
     except KeyboardInterrupt:
         cont_exec = False
         print("\n[i] Bye bye.")

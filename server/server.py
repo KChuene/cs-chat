@@ -85,10 +85,13 @@ def forward(sender : socket.SocketType, msg : bytes):
     print(f"[+] Sent {len(msg)} bytes to {count}/{len(connections)} hosts.")
 
 
-def recv_msgs(conn : socket.socket):
+def recv_msgs(conn : socket.SocketType):
     while cont_to_listen:
         try:
             msg = conn.recv(1024)
+            if not msg:
+                continue
+
             print(f"[i] New message from {conn.getpeername()}.")
             print(msg.decode("utf-8"))
 
@@ -113,7 +116,7 @@ def listen(host : str, port :int):
     sock.listen()
     print(f"[i] Listening on {host}:{port}.")
 
-    max_conns = 5
+    max_conns = 25
     while cont_to_listen:
         new_conn, conn_info = sock.accept()
         print(f"[i] Connection from {conn_info[0]}:{conn_info[1]}")
@@ -129,10 +132,7 @@ def listen(host : str, port :int):
 
         connections.append(Connection(new_conn, False))
 
-# ________________________________________________________________________________________________
 
-rq_prefixes = ["<AUTH>"] # Request prefixes for parsing client messages
-rp_prefixes = ["<AUTH_OK>", "<AUTH_BAD>"] # Response prefixes for client to parse server messages
 
 connections = [] # Connection type elements
 cont_to_listen = True # Updatable by thread listen for KeyboarInterrupt to end server

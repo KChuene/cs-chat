@@ -15,7 +15,7 @@ class Messenger {
     _messages = MessageBox();
   }
 
-  static Future<Messenger> getInstance() async {
+  static Messenger getInstance() {
     _instance ??= Messenger._construct();
 
     return _instance as Messenger;
@@ -33,12 +33,10 @@ class Messenger {
 
   void handleMessage(Map<String, dynamic> jsonObj) {
     Message message = Message.fromJson(jsonObj);
-    print("Message arrived!");
 
     switch(message.type) {
       case MsgType.auth: {
         AuthStatus.setFromJson(jsonObj);
-        print("Auth status: ${AuthStatus.isSuccess}, message: ${AuthStatus.text}");
         
         _subscriber?.handleMessage(message); // notify subscriber
         break;
@@ -52,18 +50,22 @@ class Messenger {
     }
   }
 
-  void handleNotice(MsgType type, String notice) {
+  void handleNotice(MsgType type, String message) {
     switch(type) {
       case MsgType.error:
       case MsgType.end: {
         if(AuthStatus.isSuccess) {
-          _messages?.add(Notice(
+          Notice notice = Notice(
             type: type,
-            text: notice,
-          ));
+            text: message,
+          );
+
+          _messages?.add(notice);
+          _subscriber?.handleMessage(notice);
         }
         else {
-          AuthStatus.text = notice;
+          AuthStatus.text = message;
+          _subscriber?.handleMessage(Message());
         }
         break;
       }
@@ -73,7 +75,7 @@ class Messenger {
   }
 
   void auth(String uname, String pword) async {
-    reconnect_ex();
+    reConnectEx();
     _client?.auth(
       AuthRequest(
         uname: uname, 
@@ -83,13 +85,13 @@ class Messenger {
   }
 
   void send(TextMessage message) {
-    reconnect_ex();
+    reConnectEx();
     _client?.send(message);
   }
 
-  void reconnect_ex() async {
+  void reConnectEx() async {
     if(_client!.disconnected()) {
-      await _client?.connect();
+      await _client?.connect(_instance as Messenger);
     }
   }
 }

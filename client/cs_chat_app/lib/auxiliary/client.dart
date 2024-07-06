@@ -15,28 +15,26 @@ class Client {
 
   Client({required this.host, required this.port});
 
-  Future<void> connect() async {
-    socket = await Socket.connect(host, port);
-    print("Connected to ${socket!.remoteAddress.address}:${socket!.port}.");
+  Future<void> connect(Messenger messenger) async {
 
-    print("Listening for messages");
+    try {
+      socket = await Socket.connect(host, port);
+    }
+    catch (sockErr) {
+      messenger.handleNotice(MsgType.error, "Failed to reach server." );
+      return;
+    }
+
     socket?.listen(
       (Uint8List data) async { 
         Map<String, dynamic> jsonObj = json.decode(String.fromCharCodes(data));
         
-        Messenger messenger = await Messenger.getInstance();
         messenger.handleMessage(jsonObj);
       },
-      onError: (error) async {
-        // Pass errors to AuthStatus if not authenticated else add to MessageBox
-        print("Error occured: $error");
-        
-        Messenger messenger = await Messenger.getInstance();
-        messenger.handleNotice(MsgType.error, error ); // Change to 'Internal server error. Try again later'
+      onError: (error) {
+        messenger.handleNotice(MsgType.error, "Internal error. Try again." );
       },
-      onDone: () async {
-        // Pass errors to AuthStatus if not authenticated else add to MessageBox
-        Messenger messenger = await Messenger.getInstance();
+      onDone: () {
         messenger.handleNotice(MsgType.end, "Server disconnected");
 
         socket?.destroy();
@@ -50,12 +48,15 @@ class Client {
   }
 
   void auth(AuthRequest request) {
-    print("Attempting to authenticate");
     AuthStatus.isReceived = false;
     socket?.write(json.encode(request.toJson()));
   }
 
   void send(TextMessage msg) async {
     socket?.write(json.encode(msg.toJson()));
+  }
+
+  void disconnect() {
+    socket?.destroy();
   }
 }
