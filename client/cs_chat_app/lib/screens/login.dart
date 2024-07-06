@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:cs_chat_app/auxiliary/messenger.dart';
 import 'package:cs_chat_app/auxiliary/navigatorservice.dart';
+import 'package:cs_chat_app/constants/colors.dart';
 import 'package:cs_chat_app/model/message.dart';
 import 'package:cs_chat_app/model/subscriber.dart';
 import 'package:cs_chat_app/screens/chat.dart';
@@ -20,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> implements MessengerSubscribe
 
   TextEditingController txtUsername = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
-  Text status = const Text("");
+  Text status = const Text("", style: TextStyle(fontSize: 13));
     
   @override
   Widget build(context) {
@@ -90,12 +91,13 @@ class _LoginScreenState extends State<LoginScreen> implements MessengerSubscribe
                   obscureText: true,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               Container(child: status),
+              SizedBox(height: 20,),
               ElevatedButton(
                 onPressed: () => _login(), 
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: MainColor.green,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   padding: EdgeInsets.symmetric(horizontal: 70, vertical: 15)
                 ),
@@ -129,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> implements MessengerSubscribe
             AuthStatus.text,
             style: const TextStyle(
               color: Colors.red,
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.w100
             ),
           );
@@ -145,21 +147,24 @@ class _LoginScreenState extends State<LoginScreen> implements MessengerSubscribe
           "All input fields are required.",
           style: const TextStyle(
             color: Colors.red,
-            fontSize: 10,
+            fontSize: 13,
             fontWeight: FontWeight.w100
           ),
         );
       });
+
+      return;
     }
+    
     Messenger messenger = await Messenger.getInstance();
     var pwordBytes = utf8.encode(txtPassword.text);
-    messenger.auth(txtUsername.text, sha256.convert(pwordBytes).toString());
     messenger.subscribe(this);
+    messenger.auth(txtUsername.text, sha256.convert(pwordBytes).toString());
   }
 
   void _clearWarnings() {
     setState(() {
-      status = const Text("");
+      status = const Text("", style: TextStyle(fontSize: 13),);
     });
   }
   

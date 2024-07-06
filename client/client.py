@@ -2,6 +2,7 @@ import threading
 import socket
 import json
 import sys
+import fileinput
 
 from hashlib import sha256
 from cli_model import *
@@ -45,11 +46,7 @@ def recv_messages(sock : socket.SocketType):
             in_msg = sock.recv(1024)
             
             jsonObj = json.loads(in_msg)
-            if is_auth_stat(jsonObj):
-                print(f"\r{' '*len(prompt_txt)}\n{jsonObj['text']}\n")
-                print(f"{prompt_txt}", end="", flush=True)
-
-            elif is_txt_msg(jsonObj):
+            if is_auth_stat(jsonObj) or is_txt_msg(jsonObj):
                 print(f"\r{' '*len(prompt_txt)}\n{jsonObj['text']}\n")
                 print(f"{prompt_txt}", end="", flush=True)
 

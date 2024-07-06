@@ -75,10 +75,10 @@ def is_auth_conn(sock : socket.SocketType):
 
     return False
 
-def forward(msg : bytes):
+def forward(sender : socket.SocketType, msg : bytes):
     count = 0
     for conn in connections:
-        if is_auth_conn(conn.sock):
+        if is_auth_conn(conn.sock) and conn.sock != sender:
             conn.sock.send(msg)
             count += 1
     
@@ -97,12 +97,13 @@ def recv_msgs(conn : socket.socket):
                 auth(conn, jsonObj)
 
             elif is_auth_conn(conn):
-                forward(msg)
+                forward(conn, msg)
             else:
                 status = AuthStatus(False, "Not authenticated.")
                 conn.send(str.encode( json.dumps(status.dict()) ))
 
-        except ConnectionResetError:
+        except socket.error as e:
+            print(f"[!] Receiving from {conn.getpeername()} failed. {e}")
             close_conn(conn)
 
 
@@ -118,7 +119,8 @@ def listen(host : str, port :int):
         print(f"[i] Connection from {conn_info[0]}:{conn_info[1]}")
 
         if len(connections) >= max_conns:
-            new_conn.send("Channel is full. Try again later.")
+            status = AuthStatus(False, "Channel is full. Try again later.")
+            new_conn.send(json.dumps(status.dict()))
             close_conn(new_conn)
             continue
 

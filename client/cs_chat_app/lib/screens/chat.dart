@@ -1,3 +1,6 @@
+import 'package:cs_chat_app/auxiliary/messenger.dart';
+import 'package:cs_chat_app/constants/colors.dart';
+import 'package:cs_chat_app/model/subscriber.dart';
 import 'package:cs_chat_app/widgets/chart_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:cs_chat_app/model/message.dart';
@@ -9,7 +12,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber {
   List<TextMessage> messages = TextMessage.list();
   TextEditingController messageEditController = TextEditingController();
 
@@ -77,13 +80,75 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void addMessage() {
+  void addMessage() async {
     if(messageEditController.text.trim().isNotEmpty) {
+      TextMessage message = TextMessage(
+        type: MsgType.normal,
+        text: messageEditController.text, 
+        dtSent: DateTime.now(), 
+        isFromMe: true
+      );
+
+      Messenger messenger = await Messenger.getInstance();
+      messenger.subscribe(this);
+      messenger.send(message);
       setState(() {
-        messages.add(
-          TextMessage(text: messageEditController.text, dtSent: DateTime.now(), isFromMe: true)
-        );
+        messages.add(message);
       });
     }
+  }
+  
+  @override
+  void handleMessage(Message message) {
+    print("I am a handler for Chat");
+    setState(() { 
+      switch(message.type) {
+        case MsgType.auth: {
+          if(!AuthStatus.isSuccess) {
+            _showDialog("Logged Out", AuthStatus.text);
+          } 
+          Navigator.of(context).pop();
+          break;
+        }
+        case MsgType.normal: {
+          messages.add(message as TextMessage);
+          break;
+        }
+        default: {
+          _showDialog("Notice", (message as Notice).text);
+          Navigator.of(context).pop();
+        }
+      }
+    });
+  }
+
+  Future<void> _showDialog(String title, String message) async {
+    print("I am trying to output a dialog");
+    return showDialog(
+      context: context, 
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: Text(message, style: TextStyle(fontWeight: FontWeight.w100),),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              }, 
+              child: const Text(
+                "OK", 
+                style: TextStyle(
+                  color: MainColor.green,
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 }

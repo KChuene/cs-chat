@@ -56,6 +56,6 @@ class Client {
   }
 
   void send(TextMessage msg) async {
-    socket?.write(json.encode(msg));
+    socket?.write(json.encode(msg.toJson()));
   }
 }

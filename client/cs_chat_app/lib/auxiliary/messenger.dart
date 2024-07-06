@@ -13,8 +13,6 @@ class Messenger {
   Messenger._construct() {
     _client = Client(host: "127.0.0.1", port: 178);
     _messages = MessageBox();
-
-    _client?.connect();
   }
 
   static Future<Messenger> getInstance() async {
@@ -84,16 +82,9 @@ class Messenger {
     );
   }
 
-  void send(String text) {
+  void send(TextMessage message) {
     reconnect_ex();
-    _client?.send(
-      TextMessage(
-        type: MsgType.normal,
-        dtSent: DateTime.now(), 
-        text: text, 
-        isFromMe: true
-      )
-    );
+    _client?.send(message);
   }
 
   void reconnect_ex() async {
