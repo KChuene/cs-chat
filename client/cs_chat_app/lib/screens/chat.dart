@@ -20,6 +20,8 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
   TextEditingController messageEditController = TextEditingController();
   Messenger messenger = Messenger.getInstance();
 
+  ScrollController scrollControl = ScrollController();
+
   @override
   void initState() {
     messenger.subscribe(this);

@@ -21,10 +21,10 @@ def close_conn(sock : socket.SocketType):
 
 
 def check_authfile(uname : str, pword : str):
-    if not Path("./data/.authfile").exists():
+    if not Path("../data/.authfile").exists():
         return False, "Cannot authenticate at the moment."
 
-    with open("./data/.authfile", "r") as authfile:
+    with open("../data/.authfile", "r") as authfile:
         line = authfile.readline()
         
         while line: # Ignore newline char
@@ -86,13 +86,14 @@ def forward(sender : socket.SocketType, msg : bytes):
 
 
 def recv_msgs(conn : socket.SocketType):
+    remote = conn.getpeername()
     while cont_to_listen:
         try:
             msg = conn.recv(1024)
             if not msg:
                 continue
 
-            print(f"[i] New message from {conn.getpeername()}.")
+            print(f"[i] New message from {remote}.")
             print(msg.decode("utf-8"))
 
             jsonObj = json.loads(msg)
@@ -105,8 +106,8 @@ def recv_msgs(conn : socket.SocketType):
                 status = AuthStatus(False, "Not authenticated.")
                 conn.send(str.encode( json.dumps(status.dict()) ))
 
-        except socket.error as e:
-            print(f"[!] Receiving from {conn.getpeername()} failed. {e}")
+        except Exception as e:
+            print(f"[!] Receiving from {remote} failed. {e}")
             close_conn(conn)
 
 

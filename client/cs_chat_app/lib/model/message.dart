@@ -33,12 +33,8 @@ class TextMessage extends Message {
 
   static List<TextMessage> list() {
     return [
-      TextMessage(text: "Wazzup bro.", dtSent: DateTime.now(), isFromMe: false),
-      TextMessage(text: "Homie, what's going on; I was wondering where you been at?", dtSent: DateTime.now(), isFromMe: true),
-      TextMessage(text: "Busy days it's been. But finally have some time off now.", dtSent: DateTime.now(), isFromMe: false),
-      TextMessage(text: "That's good to here.", dtSent: DateTime.now(), isFromMe: true),
-      TextMessage(text: "So... game night?", dtSent: DateTime.now(), isFromMe: true),
-      TextMessage(text: "You bet!!", dtSent: DateTime.now(), isFromMe: false)
+      TextMessage(text: "Hello You.", dtSent: DateTime.now(), isFromMe: false),
+      TextMessage(text: "Hello Friend.", dtSent: DateTime.now(), isFromMe: true),
     ];
   }
   
