@@ -135,6 +135,8 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
       setState(() {
         messages.add(message);
       });
+      
+      messageEditController.clear();
     }
   }
   

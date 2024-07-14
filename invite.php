@@ -24,7 +24,7 @@ if(in_array($key, $register_keys)) {
 
 save_key($key);
 echo "[i] Invite key is ".$key.".\n";
-echo "[i] Invite link: http://localhost:8080/register?key=".$key."\n"; 
+echo "[i] Invite link: http://localhost:8080/register.php?key=".$key."\n"; 
 echo "[+] Done.";
 
 function safe_read(array $args, string $option, bool $required) {
