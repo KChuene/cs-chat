@@ -3,7 +3,7 @@ $uname = trim($_POST["username"]);
 $pword = trim($_POST["password"]);
 
 if(empty($uname) || empty($pword)) {
-    header("Location: register.php");
+    header("Location: ".$_SERVER["HTTP_REFERER"]);
 }
 else if(!file_exists("./data")) {
     mkdir("./data");
