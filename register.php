@@ -1,7 +1,11 @@
 <html>
 <head>
-<title> CS Chat | Register </title>
-<link href='./css/register.css' rel='stylesheet' />
+    <title> CS Chat | Register </title>
+    
+    <link href='./css/register.css' rel='stylesheet' />
+    
+    <script src="./scripts/jquery-3.7.1.min.js"></script>
+    <script src="./scripts/validator.js"></script>
 </head>
 
 <body>
@@ -24,21 +28,27 @@
         }
 
         $key = $_GET["key"];
-    
         $handle = fopen("./data/.registerkeys", "r");
+
+        $authorized = false;
         $line = trim(fgets($handle));
         while($line) {
             if($key == $line) {
-                include("register.form.html");
-                exit();
+                $authorized = true;
+                break;
             }
             $line = trim(fgets($handle));
         }
 
-        echo "
-            <h1> Forbidden </h1>
-            <h3> Provided Key is Not Unauthorized </h3>
-        ";
+        if($authorized) {
+            include("register.form.html");
+        }
+        else {
+            echo "
+                <h1> Forbidden </h1>
+                <h3> Provided Key is Not Unauthorized </h3>
+            ";
+        }
     ?>
     </center>
 </body>

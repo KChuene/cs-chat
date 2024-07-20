@@ -1,6 +1,19 @@
 h1 {
     font-size: 50px;
+    font-family: Arial, Helvetica, sans-serif;
     text-decoration: underline;
+}
+
+#txt_error {
+    padding: 2px 10px;
+    display: inline-block;
+
+    color: white;
+    background-color: rgb(241, 13, 13);
+    border-radius: 3px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: small;
 }
 
 .field {
