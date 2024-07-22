@@ -19,13 +19,15 @@ class Message {
 
 }
 
-class TextMessage extends Message {
+class TextMessage extends Message {  
   String text = "";
+  String sender = "";
   bool? isFromMe;
   DateTime? dtSent;
 
   TextMessage({
     required this.text,
+    required this.sender,
     required this.dtSent,
     required this.isFromMe,
     super.type
@@ -33,8 +35,8 @@ class TextMessage extends Message {
 
   static List<TextMessage> list() {
     return [
-      TextMessage(text: "Hello You.", dtSent: DateTime.now(), isFromMe: false),
-      TextMessage(text: "Hello Friend.", dtSent: DateTime.now(), isFromMe: true),
+      TextMessage(text: "Hello You.", sender: AuthStatus.uname, dtSent: DateTime.now(), isFromMe: false),
+      TextMessage(text: "Hello Friend.", sender: AuthStatus.uname, dtSent: DateTime.now(), isFromMe: true),
     ];
   }
   
@@ -54,6 +56,7 @@ class TextMessage extends Message {
 }
 
 class AuthStatus extends Message {
+  static String uname = "";
   static bool isReceived = false;
   static bool isSuccess = false;
   static String text = "";

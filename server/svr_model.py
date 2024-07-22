@@ -19,14 +19,16 @@ class AuthStatus:
     
 
 class TextMessage:
-    def __init__(self, text, date) -> None:
+    def __init__(self, uname, text, date) -> None:
         self.type = MsgType.normal
+        self.sender = uname
         self.text = text
         self.date = date
 
     def dict(self):
         return {
             "type": self.type.name,
+            "sender": self.sender,
             "text": self.text,
             "date": self.date
         }

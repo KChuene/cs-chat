@@ -3,9 +3,6 @@
     <title> CS Chat | Register </title>
     
     <link href='./css/register.css' rel='stylesheet' />
-    
-    <script src="./scripts/jquery-3.7.1.min.js"></script>
-    <script src="./scripts/validator.js"></script>
 </head>
 
 <body>
@@ -51,5 +48,8 @@
         }
     ?>
     </center>
+
+    <script src="./scripts/jquery-3.7.1.min.js"></script>
+    <script src="./scripts/validator.js"></script>
 </body>
 </html>

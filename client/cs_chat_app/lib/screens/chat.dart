@@ -126,6 +126,7 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
     if(messageEditController.text.trim().isNotEmpty) {
       TextMessage message = TextMessage(
         type: MsgType.normal,
+        sender: AuthStatus.uname,
         text: messageEditController.text, 
         dtSent: DateTime.now(), 
         isFromMe: true

@@ -1,4 +1,3 @@
-document.writeln("<h1> Spaces not allowed </h1>");
 $(document).ready(
     function() {
         $("txt_error").hide();

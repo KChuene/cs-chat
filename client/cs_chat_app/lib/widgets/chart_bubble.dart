@@ -21,15 +21,15 @@ class ChatBubble extends StatelessWidget {
               maxWidth: MediaQuery.sizeOf(context).width * 0.75
             ),
         
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: (message.isFromMe!)? Colors.green : Color.fromRGBO(123, 116, 116, 1),
+              color: (message.isFromMe!)? Colors.green : const Color.fromRGBO(123, 116, 116, 1),
               borderRadius: BorderRadius.circular(8)
             ),
             
             child: Text(
-              message.text!,
-              style: TextStyle(
+              message.text,
+              style: const TextStyle(
                 color: Colors.white
               ),
             ),
@@ -39,8 +39,8 @@ class ChatBubble extends StatelessWidget {
           mainAxisAlignment: (message.isFromMe!)? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             Text(
-              TimeOfDay.fromDateTime(message.dtSent!).format(context),
-              style: TextStyle(
+              "${(message.isFromMe!)?"You": message.sender} ${TimeOfDay.fromDateTime(message.dtSent!).format(context)}",
+              style: const TextStyle(
                 fontSize: 11
               ),
             )

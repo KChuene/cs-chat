@@ -76,6 +76,8 @@ class Messenger {
 
   void auth(String uname, String pword) async {
     reConnectEx();
+
+    AuthStatus.uname = uname;
     _client?.auth(
       AuthRequest(
         uname: uname, 

@@ -18,6 +18,7 @@ def is_txt_msg(msg : dict):
     return isinstance(msg, dict) and msg.get("type") == MsgType.normal.name
 
 def login() -> AuthRequest:
+    global uname
     uname = input("Username: ").strip()
     pword = input("Password: ").strip()
 
@@ -47,7 +48,7 @@ def recv_messages(sock : socket.SocketType):
             
             jsonObj = json.loads(in_msg)
             if is_auth_stat(jsonObj) or is_txt_msg(jsonObj):
-                print(f"\r{' '*len(prompt_txt)}\n{jsonObj['text']}\n")
+                print(f"\r{' '*len(prompt_txt)}\n{jsonObj['sender']} ~ {jsonObj['text']}\n")
                 print(f"{prompt_txt}", end="", flush=True)
 
         return
@@ -71,7 +72,7 @@ def send_messages(sock : socket.SocketType):
                     sock.send(str.encode( json.dumps(auth_req.dict()) ))
 
             elif out_msg:
-                text_msg = TextMessage(out_msg, str(datetime.now()))
+                text_msg = TextMessage(uname, out_msg, str(datetime.now()))
                 sock.send(str.encode( json.dumps(text_msg.dict()) ))
 
             print(prompt_txt, end="")
@@ -83,6 +84,7 @@ def send_messages(sock : socket.SocketType):
 
 cont_exec = True
 prompt_txt = "(message)~$ "
+uname = ""
 
 if __name__=="__main__":
     host = "127.0.0.1"

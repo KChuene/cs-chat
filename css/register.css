@@ -1,11 +1,17 @@
+body {
+    background-color: rgb(50, 48, 48);
+}
+
 h1 {
-    font-size: 50px;
+    color:rgb(18, 120, 18);
+
+    font-size: 100px;
     font-family: Arial, Helvetica, sans-serif;
     text-decoration: underline;
 }
 
 #txt_error {
-    padding: 2px 10px;
+    padding: 4px 10px;
     display: inline-block;
 
     color: white;
@@ -17,23 +23,29 @@ h1 {
 }
 
 .field {
-    padding: 5px 7px;
-    margin-bottom: 5px;
+    padding: 10px 25px;
+    margin-bottom: 8px;
 
     color: rgb(154, 151, 151);
     outline: none;
 
-    border-radius: 5px;
+    box-shadow: none;
+
+    border-color: grey;
+    border-width: 2px;
+    border-radius: 25px;
 
     font-size: 25px;
 }
 
 #btn_submit {
     padding: 5px 7px;
+    width: 140px;
+    height: 45px;
 
     color: white;
-    background-color: rgb(26, 128, 26);
-    border-radius: 5px;
+    background-color: rgb(18, 120, 18);
+    border-radius: 25px;
 
     font-size: 20px;
     font-weight: bold;
@@ -42,5 +54,5 @@ h1 {
 }
 
 #btn_submit:hover {
-    background-color: rgb(8, 82, 8);
+    background-color: rgb(10, 89, 10);
 }
