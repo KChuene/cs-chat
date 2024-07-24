@@ -1,44 +1,88 @@
 $(document).ready(
     function() {
-        $("txt_error").hide();
+        clear_err();
+        $("form").submit(
+            function(event) {
+                event.preventDefault();
 
-        $("txt_uname").onchange(
-            function() {
-                var uname = $("txt_uname").val.trim();
-                if(uname == '') {
-                    console.log("Spaces not allowed");
-                    $("txt_error").text = "Spaces are ignored.";
-                    $("txt_error").show();
-                    // $("txt_uname").clear();
-                    return;
-                }
+                available_check();
 
-                check(uname);
+                const formData = new FormData(event.target);
+                const username = formData.get('username');
+                const password = formData.get('password');
+
+                fetch('/rhandler.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .catch(error => {
+                    display_err("Could not reach server.");
+                });
             }
         );
     }
 );
 
-function check(uname) {
-    console.log("Just checking");
-    $.ajax({
-        url: "validator.php",
-        type: "post",
-        data: {uname: uname},
-        success: function(response) {
-            if(response != 0) {
-                $("txt_error").text = "Username unavailable.";
-                $("txt_error").show();
-            } else {
-                clear_err();
-            }
-        }
-    }
+function whitespace_check() {
+    var uname = $("#txt_uname").val();
 
+    if(uname.length > 0 && uname.trim() == '') {
+        display_err("Spaces are ignored.");
+
+        $("#txt_uname").value = "";
+        return;
+    }
+    else {
+        clear_err()
+    }
+}
+
+function available_check() {
+    var uname = $("#txt_uname").val().trim();
+
+    $.ajax({
+        url: "/scripts/uname_validator.php",
+        type: "post",
+        data: {uname: uname}
+    })
+    .done(
+        function(response) {
+            if(response != "") {
+                if(response != 0) {
+                    display_err("Username unavailable.");
+                }
+                else {
+                    clear_err();
+                    $("form").submit();
+                }
+            } 
+        }
+    )
+    .fail(
+        function(response) {
+            display_err(response.responseText);
+        }
     );
 }
 
+function display_err(err) {
+    $("#txt_error").text(err);
+    $("#txt_error").show();  
+}
+
 function clear_err() {
-    $("txt_error").text = "";
-    $("txt_error").hide();
+    $("#txt_error").text("");
+    $("#txt_error").hide();
+}
+
+function json_parse(data) {
+    try {
+        return JSON.parse(data);
+    }
+    catch(e) {
+        return null;
+    }
 }

@@ -52,4 +52,6 @@
     <script src="./scripts/jquery-3.7.1.min.js"></script>
     <script src="./scripts/validator.js"></script>
 </body>
+
+
 </html>

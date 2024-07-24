@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:cs_chat_app/auxiliary/messenger.dart';
-import 'package:cs_chat_app/auxiliary/navigatorservice.dart';
 import 'package:cs_chat_app/constants/colors.dart';
 import 'package:cs_chat_app/model/message.dart';
 import 'package:cs_chat_app/model/subscriber.dart';

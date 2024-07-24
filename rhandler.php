@@ -15,10 +15,6 @@
         if(empty($uname) || empty($pword)) {
             header("Location: ".$_SERVER["HTTP_REFERER"]);
         }
-        elseif(not_unique_uname($uname)) {
-            echo "<h1> Username is unavailable.</h1>";
-            return;
-        }
         else if(!file_exists("./data")) {
             mkdir("./data");
         }
@@ -33,22 +29,6 @@
                     You have successfully <br/> registered!
             </h1>
         ";
-
-
-        function not_unique_uname(string $uname) {
-            $authfile = fopen("./data/.authfile", "r");
-
-            $line = fgets($authfile);
-            while($line != null) {
-                $curr = explode(":", $line)[0];
-                if($curr == $uname) {
-                    return true;
-                } 
-
-                $line = fgets($authfile);
-            }
-            return false;
-        }
     ?>
     </center>
 
