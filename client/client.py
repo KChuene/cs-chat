@@ -48,7 +48,9 @@ def recv_messages(sock : socket.SocketType):
             
             jsonObj = json.loads(in_msg)
             if is_auth_stat(jsonObj) or is_txt_msg(jsonObj):
-                print(f"\r{' '*len(prompt_txt)}\n{jsonObj['sender']} ~ {jsonObj['text']}\n")
+                pretext = f"{jsonObj['sender']} ~ " if "sender" in jsonObj else ""
+                
+                print(f"\r{' '*len(prompt_txt)}\n{pretext}{jsonObj['text']}\n")
                 print(f"{prompt_txt}", end="", flush=True)
 
         return

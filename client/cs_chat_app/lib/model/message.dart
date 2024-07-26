@@ -42,6 +42,7 @@ class TextMessage extends Message {
   
   TextMessage.fromJson(Map<String, dynamic> json) {
     type = MsgType.values.firstWhere((t) => t.name == json["type"]);
+    sender = json["sender"] as String;
     text = json["text"] as String;
     isFromMe = false;
     dtSent = DateTime.parse(json["date"]);
@@ -49,6 +50,7 @@ class TextMessage extends Message {
     
   Map<String, dynamic> toJson() => {
     "type": type.name,
+    "sender": sender,
     "text": text,
     "isFromMe": isFromMe,
     "date": dtSent.toString()
