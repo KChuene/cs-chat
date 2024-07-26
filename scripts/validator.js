@@ -5,20 +5,32 @@ $(document).ready(
             function(event) {
                 event.preventDefault();
 
-                available_check();
-
                 const formData = new FormData(event.target);
-                const username = formData.get('username');
-                const password = formData.get('password');
+                const uname = formData.get('username').trim();
+                const pword = formData.get('password').trim();
 
-                fetch('/rhandler.php', {
-                    method: 'POST',
-                    body: JSON.stringify({ username, password }),
-                    headers: {
-                        'Content-Type': 'application/json'
+                if(uname == "" || pword == "") {
+                    return;
+                }
+
+                $.ajax({
+                    url: "/scripts/rhandler.php",
+                    method: 'post',
+                    data: { username: uname, password: pword }
+                })
+                .done(re => {
+                    const data = json_parse(re);
+
+                    if(data != null && data.length > 0) {
+                        if(data[0].code != 0) {
+                            display_err(data[0].mesg);
+                        } 
+                        else {
+                            location.replace("/welcome.html");
+                        }
                     }
                 })
-                .catch(error => {
+                .fail(_ => {
                     display_err("Could not reach server.");
                 });
             }
@@ -38,34 +50,6 @@ function whitespace_check() {
     else {
         clear_err()
     }
-}
-
-function available_check() {
-    var uname = $("#txt_uname").val().trim();
-
-    $.ajax({
-        url: "/scripts/uname_validator.php",
-        type: "post",
-        data: {uname: uname}
-    })
-    .done(
-        function(response) {
-            if(response != "") {
-                if(response != 0) {
-                    display_err("Username unavailable.");
-                }
-                else {
-                    clear_err();
-                    $("form").submit();
-                }
-            } 
-        }
-    )
-    .fail(
-        function(response) {
-            display_err(response.responseText);
-        }
-    );
 }
 
 function display_err(err) {
