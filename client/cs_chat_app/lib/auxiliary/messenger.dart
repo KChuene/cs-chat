@@ -7,19 +7,27 @@ class Messenger {
   Client? _client; // send requests to, get responses from
   MessageBox? _messages;
   MessengerSubscriber? _subscriber; // get requests from, send responses to
+  final String? _destAddress;
+  final int? _destPort;
 
   static Messenger? _instance;
   
-  Messenger._construct() {
-    _client = Client(host: "127.0.0.1", port: 178);
+  Messenger._construct(this._destAddress, this._destPort) {
+    _client = Client();
     _messages = MessageBox();
   }
 
-  static Messenger getInstance() {
-    _instance ??= Messenger._construct();
+  static Messenger getInstance({String? host, int? port}) {
+    bool newAddress = (host != null) && (port != null);
+    if(_instance == null || newAddress) {
+      _instance = Messenger._construct(host, port);
+    }    
 
     return _instance as Messenger;
   }
+
+  String? getDestIPv4() => _destAddress;
+  int? getDestPort() => _destPort;
 
   void subscribe(MessengerSubscriber subscriber) {
     _subscriber = subscriber;
@@ -74,8 +82,12 @@ class Messenger {
     }
   }
 
+  bool connected() {
+    return _client?.connected() as bool;
+  }
+
   void auth(String uname, String pword) async {
-    reConnectEx();
+    await reConnectEx();
 
     AuthStatus.uname = uname;
     _client?.auth(
@@ -86,14 +98,16 @@ class Messenger {
     );
   }
 
-  void send(TextMessage message) {
-    reConnectEx();
+  void send(TextMessage message) async {
+    await reConnectEx();
     _client?.send(message);
   }
 
-  void reConnectEx() async {
-    if(_client!.disconnected()) {
-      await _client?.connect(_instance as Messenger);
+  Future<void> reConnectEx() async {
+    if(_destAddress != null || _destPort != null) {
+      if(!_client!.connected()) {
+        await _client?.connect(this);
+      }
     }
   }
 }

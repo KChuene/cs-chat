@@ -12,13 +12,8 @@ class Connection:
 
 def close_conn(sock : socket.SocketType):
     for conn in connections:
-        if conn.sock == sock:
+        if not conn.sock or conn.sock == sock:
             connections.remove(conn)
-            break
-
-    sock.shutdown(1)
-    sock.close()
-
 
 def check_authfile(uname : str, pword : str):
     if not Path("../data/.authfile").exists():
@@ -78,7 +73,7 @@ def is_auth_conn(sock : socket.SocketType):
 def forward(sender : socket.SocketType, msg : bytes):
     count = 0
     for conn in connections:
-        if is_auth_conn(conn.sock) and conn.sock != sender:
+        if conn.sock and is_auth_conn(conn.sock) and conn.sock != sender:
             conn.sock.send(msg)
             count += 1
     
@@ -87,6 +82,7 @@ def forward(sender : socket.SocketType, msg : bytes):
 
 def recv_msgs(conn : socket.SocketType):
     remote = conn.getpeername()
+    cont_to_listen = True
     while cont_to_listen:
         try:
             msg = conn.recv(1024)
@@ -105,9 +101,15 @@ def recv_msgs(conn : socket.SocketType):
             else:
                 status = AuthStatus(False, "Not authenticated.")
                 conn.send(str.encode( json.dumps(status.dict()) ))
+        
+        except ConnectionResetError:
+            print(f"[!] {remote} disconnected.")
+            cont_to_listen = False
+            close_conn(conn)
 
         except Exception as e:
             print(f"[!] Receiving from {remote} failed. {e}")
+            cont_to_listen = False
             close_conn(conn)
 
 
@@ -117,8 +119,8 @@ def listen(host : str, port :int):
     sock.listen()
     print(f"[i] Listening on {host}:{port}.")
 
-    max_conns = 25
-    while cont_to_listen:
+    max_conns = 5
+    while True:
         new_conn, conn_info = sock.accept()
         print(f"[i] Connection from {conn_info[0]}:{conn_info[1]}")
 
@@ -136,7 +138,6 @@ def listen(host : str, port :int):
 
 
 connections = [] # Connection type elements
-cont_to_listen = True # Updatable by thread listen for KeyboarInterrupt to end server
 
 if __name__=="__main__":
     host = "0.0.0.0"

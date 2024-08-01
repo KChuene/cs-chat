@@ -2,23 +2,18 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:cs_chat_app/auxiliary/messagebox.dart';
 import 'package:cs_chat_app/auxiliary/messenger.dart';
 import 'package:cs_chat_app/model/message.dart';
 
 class Client {
 
-  String host;
-  int port;
   Socket? socket;
-  MessageBox msgBox = MessageBox();
-
-  Client({required this.host, required this.port});
+  Client();
 
   Future<void> connect(Messenger messenger) async {
 
     try {
-      socket = await Socket.connect(host, port);
+      socket = await Socket.connect(messenger.getDestIPv4(), messenger.getDestPort() as int);
     }
     catch (sockErr) {
       messenger.handleNotice(MsgType.error, "Failed to reach server." );
@@ -43,8 +38,8 @@ class Client {
     );
   }
 
-  bool disconnected() {
-    return socket == null;
+  bool connected() {
+    return socket != null;
   }
 
   void auth(AuthRequest request) {

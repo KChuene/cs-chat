@@ -18,13 +18,11 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber {
   List<TextMessage> messages = TextMessage.list();
   TextEditingController messageEditController = TextEditingController();
-  Messenger messenger = Messenger.getInstance();
 
   ScrollController scrollControl = ScrollController();
 
   @override
   void initState() {
-    messenger.subscribe(this);
     super.initState();
   }
 
@@ -123,7 +121,9 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
   }
 
   void addMessage() async {
-    if(messageEditController.text.trim().isNotEmpty) {
+    Messenger messenger = Messenger.getInstance();
+
+    if(messageEditController.text.trim().isNotEmpty && messenger.connected()) {
       TextMessage message = TextMessage(
         type: MsgType.normal,
         sender: AuthStatus.uname,
@@ -132,6 +132,8 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
         isFromMe: true
       );
 
+      
+      messenger.subscribe(this);
       messenger.send(message);
       setState(() {
         messages.add(message);
