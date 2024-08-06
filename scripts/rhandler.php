@@ -16,6 +16,10 @@
 
     $name_taken = is_unavailable($uname);
     if(!$name_taken) {
+        if(!is_secure_pass($pword)) {
+            bye(-1, "Password does not meet requirements.");
+        }
+
         $pword = hash("sha256", $pword);
 
         try {
@@ -26,7 +30,7 @@
             bye(0, "Registered.");
         }
         catch(_) {
-            bye("Cannot register right now.");
+            bye(-1, "Cannot register right now.");
         }
     }
     else {
@@ -60,6 +64,43 @@
             $line = fgets($authfile);
         }
         return false; // not taken
+    }
+
+    function is_secure_pass(string $pword) {
+        /*
+            POLICY
+            * Minimum length of 12
+            * At least 2 special character
+            * At least 2 numbers
+            * At least 4 alphabets
+        */
+
+        
+        if($pword.count() >= 12) {
+            $s_chars = [
+                "`","~","!","@","#","$","%","^",
+                "&","*","(",")","-","_","+","=",
+                "{","}","[","]",":",";","'","\"",
+                "<",">",",",".","?","/","|","\\"
+            ];
+
+            $sc_count = $n_count = $alpha_count = 0;
+            foreach($pword as $pwd_chr) {
+                if(in_array($pwd_chr, $s_chars)) {
+                    $sc_count++;
+                }
+                elseif(is_numeric($pwd_chr)) {
+                    $n_count++;
+                }
+                elseif(ctype_alpha($pwd_chr)) {
+                    $alpha_count++;
+                }
+            }
+
+            return $sc_count >= 2 && $n_count >= 2 && $alpha_count >= 4;
+        }
+
+        return false;
     }
 
     function bye(int $code, string $res) {

@@ -1,17 +1,24 @@
 body {
+    font-family: Arial, Helvetica, sans-serif;
+
     /*background-color: rgb(44, 43, 43);*/
     background-color: rgb(198, 193, 193);
     background-image: url("/images/colorized-green-wallpaper.png");
 }
 
-#frm_container {
+#main_container {
+    margin-top: 20px;
     width: fit-content;
-
-    margin-top: 100px;
-    padding: 40px;
 
     background-color: rgb(44, 43, 43);
     border-radius: 20px;
+}
+
+#frm_container {
+    display: inline-block;
+
+    margin-top: 10px;
+    padding: 20px 40px;
 }
 
 h1 {
@@ -55,6 +62,7 @@ h1 {
 }
 
 #btn_submit {
+    margin-top: 10px;
     padding: 5px 7px;
     width: 140px;
     height: 45px;
@@ -72,3 +80,33 @@ h1 {
 #btn_submit:hover {
     background-color: rgb(10, 89, 10);
 }
+
+hr {
+    margin-top: 20px;
+}
+
+#policy_container {
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-bottom: 20px;
+}
+
+#policy_container h5 {
+    color: white;
+    text-align: left;
+}
+
+ul {
+    list-style-type: none;
+    text-align: left;
+    font-size: 15px;
+}
+
+ul li {
+    color: white;
+}
+
+/* 
+Cross - https://www.flaticon.com/free-icons/delete", Delete icons created by Pixel perfect - Flaticon 
+Check - https://www.flaticon.com/free-icons/yes, Yes icons created by juicy_fish - Flaticon
+*/

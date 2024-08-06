@@ -1,13 +1,26 @@
-<div id="frm_container">
-    <h1> CS Chat </h1>
-    <form action="./scripts/rhandler.php" method="POST">
-        <div id="err_container">
-            <h4 id="txt_error"></h4>
-        </div>
-        
-        <input id="txt_uname" class="field" type="text" name="username" placeholder="Username" oninput="whitespace_check()" required/> <br/>
-        <input id= "txt_pword" class="field" type="password" name="password" placeholder="Password" required/> <br/>
+<div id="main_container">
+    
+    <div id="frm_container">
+        <h1> CS Chat </h1>
+        <form action="./scripts/rhandler.php" method="POST">
+            <div id="err_container">
+                <h4 id="txt_error"></h4>
+            </div>
+            
+            <input id="txt_uname" class="field" type="text" name="username" placeholder="Username" oninput="whitespace_check()" required/> <br/>
+            <input id= "txt_pword" class="field" type="password" name="password" placeholder="Password" oninput="policy_check()" required/> <br/>
 
-        <input id="btn_submit" type="submit" value="Register" /> </br>
-    </form>
+            <input id="btn_submit" type="submit" value="Register" /> </br>
+        </form>
+    </div>  
+    <hr/>
+    <div id="policy_container">
+        <h5><b>Password Policy</b></h6>
+        <ul>
+            <li><img id="plc_length_ico" src="/images/icons/cross.png"/> Minimum length of 12</li>
+            <li><img id="plc_schars_ico" src="/images/icons/cross.png"/> At least 2 special character</li>
+            <li><img id="plc_number_ico" src="/images/icons/cross.png"/> At least 2 numbers</li>
+            <li><img id="plc_alphas_ico" src="/images/icons/cross.png"/> At least 4 alphabets</li>
+        </ul>
+    </div>
 </div>
