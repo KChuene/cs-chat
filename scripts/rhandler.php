@@ -76,7 +76,7 @@
         */
 
         
-        if($pword.count() >= 12) {
+        if(strlen($pword) >= 12) {
             $s_chars = [
                 "`","~","!","@","#","$","%","^",
                 "&","*","(",")","-","_","+","=",
@@ -85,14 +85,14 @@
             ];
 
             $sc_count = $n_count = $alpha_count = 0;
-            foreach($pword as $pwd_chr) {
-                if(in_array($pwd_chr, $s_chars)) {
+            for($i = 0; $i < strlen($pword); $i++) {
+                if(in_array($pword[$i], $s_chars)) {
                     $sc_count++;
                 }
-                elseif(is_numeric($pwd_chr)) {
+                elseif(is_numeric($pword[$i])) {
                     $n_count++;
                 }
-                elseif(ctype_alpha($pwd_chr)) {
+                elseif(ctype_alpha($pword[$i])) {
                     $alpha_count++;
                 }
             }

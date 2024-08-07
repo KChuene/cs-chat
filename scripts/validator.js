@@ -9,7 +9,7 @@ $(document).ready(
                 const uname = formData.get('username').trim();
                 const pword = formData.get('password').trim();
 
-                var pwordPolicyMet = policy_check()
+                var pwordPolicyMet = policy_check();
                 if(uname == "" || pword == "" || !pwordPolicyMet) {
                     return;
                 }
@@ -64,7 +64,7 @@ function policy_check() {
     ];
 
     sc_count = n_count = alpha_count = 0;
-    s_chars.forEach(function(pwd_char) {
+    for(pwd_char of pword) {
         if(s_chars.includes(pwd_char)) {
             sc_count++;
         }
@@ -74,7 +74,7 @@ function policy_check() {
         else if(/^[a-zA-Z]$/.test(pwd_char)) {
             alpha_count++;
         }
-    });  
+    }  
     
     /*
     POLICY
@@ -91,10 +91,10 @@ function set_policy(length, sc_count, n_count, alpha_count) {
     const failIcon = "/images/icons/cross.png";
     const succIcon = "/images/icons/check.png"; 
 
-    $("plc_length_ico").src = (length)? succIcon: failIcon;
-    $("plc_schars_ico").src = (sc_count)? succIcon: failIcon;
-    $("plc_number_ico").src = (n_count)? succIcon: failIcon;
-    $("plc_alphas_ico").src = (alpha_count)? succIcon: failIcon;
+    $("#plc_length_ico").attr("src", (length)? succIcon: failIcon);
+    $("#plc_schars_ico").attr("src", (sc_count)? succIcon: failIcon);
+    $("#plc_number_ico").attr("src", (n_count)? succIcon: failIcon);
+    $("#plc_alphas_ico").attr("src", (alpha_count)? succIcon: failIcon);
 }
 
 
