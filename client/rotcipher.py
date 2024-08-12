@@ -5,6 +5,7 @@ def rot47(text: str) -> str:
     for char in text:
         dec = ord(char)
         if dec < 33 or dec > 126:
+            result.append(char)
             continue
 
         rotdec = dec
