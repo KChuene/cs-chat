@@ -2,8 +2,8 @@ import threading
 import socket
 import json
 import sys
-import fileinput
 import datetime
+import rotcipher
 
 from hashlib import sha256
 from cli_model import *
