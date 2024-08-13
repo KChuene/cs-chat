@@ -2,6 +2,7 @@ import socket
 import threading
 import json
 import rotcipher
+import sys
 
 from svr_model import *
 from pathlib import Path
@@ -11,16 +12,44 @@ class Connection:
         self.sock = sock
         self.auth = is_auth
 
+def bye(code: int, msg: str):
+    if msg:
+        print(msg)
+
+    print("usage: server.py -af \"path/to/.authfile\"")
+    sys.exit(code)
+
+def safe_read(argv: list[str], option: str) -> str:
+    valid_opts = ["-af"]
+
+    if not len(argv) > 1:
+        bye(-1, "Insufficient arguments.")
+    
+    elif not option in argv:
+        bye(-1, f"Option {option} is required.")
+
+
+    opt_idx = argv.index(option)
+    if opt_idx + 1 >= len(argv):
+        bye(-1, f"Value expected for {option}.")
+    
+    value = argv[opt_idx + 1]
+    if value in valid_opts:
+        bye(-1, f"Invalid value '{value}' for {option}.")
+    
+    return value
+
 def close_conn(sock : socket.SocketType):
     for conn in connections:
         if not conn.sock or conn.sock == sock:
             connections.remove(conn)
 
 def check_authfile(uname : str, pword : str):
-    if not Path("./data/.authfile").exists():
+    global authfile
+    if not Path(authfile).exists():
         return False, "Cannot authenticate at the moment."
 
-    with open("./data/.authfile", "r") as authfile:
+    with open(authfile, "r") as authfile:
         line = authfile.readline()
         
         while line: # Ignore newline char
@@ -147,10 +176,12 @@ def listen(host : str, port :int):
 
 
 connections = [] # Connection type elements
+authfile = "./data/.authfile"
 
 if __name__=="__main__":
     host = "0.0.0.0"
     port = 178
+    #authfile = safe_read(sys.argv, "-af")
 
     try: 
         listen(host, port)

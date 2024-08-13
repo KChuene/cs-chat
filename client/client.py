@@ -13,7 +13,7 @@ def usage(msg : str):
     if msg:
         print(msg)
     
-    print("usage: program.py [-h] -addr <IPv4 address> -p <port>")
+    print("usage: program.py [-h] -svr <IPv4 address> -p <port>")
     sys.exit()
 
 def valid_addr(host : str, port : str):
@@ -123,10 +123,10 @@ prompt_txt = "(message)~$ "
 uname = ""
 
 if __name__=="__main__":
-    sys.argv.append("-svr")
-    sys.argv.append("127.0.0.1")
-    sys.argv.append("-p")
-    sys.argv.append("178")
+    # sys.argv.append("-svr")
+    # sys.argv.append("127.0.0.1")
+    # sys.argv.append("-p")
+    # sys.argv.append("178")
     if "-h" in sys.argv:
         usage(None)
 
