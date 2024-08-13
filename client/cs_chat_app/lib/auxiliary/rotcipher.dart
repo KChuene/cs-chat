@@ -1,7 +1,7 @@
 class ROT {
   static String _rot47(String text) {
     StringBuffer result = StringBuffer();
-    text.runes.forEach((int elem) { 
+    for (var elem in text.runes) { 
       if(elem < 33 || elem > 126) {
         result.writeCharCode(elem);
       } 
@@ -11,7 +11,7 @@ class ROT {
       else {
         result.writeCharCode(32 + ((elem + 47) - 126));
       }
-    });
+    }
 
     return result.toString();
   }

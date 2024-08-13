@@ -2,10 +2,10 @@ import threading
 import socket
 import json
 import sys
-import datetime
 import rotcipher
 
 from hashlib import sha256
+from datetime import datetime
 from cli_model import *
 
 
@@ -76,7 +76,8 @@ def recv_messages(sock : socket.SocketType):
         while cont_exec:
             in_msg = sock.recv(1024)
             
-            jsonObj = json.loads(in_msg)
+            deo_msg = rotcipher.deobfuscate(in_msg.decode("utf-8"))
+            jsonObj = json.loads(deo_msg)
             if is_auth_stat(jsonObj) or is_txt_msg(jsonObj):
                 pretext = f"{jsonObj['sender']} ~ " if "sender" in jsonObj else ""
                 # timestamp = f"[{datetime(jsonObj['date']).timetz()}]" if "date" in jsonObj else ""
@@ -102,11 +103,13 @@ def send_messages(sock : socket.SocketType):
                 auth_req = login()
 
                 if auth_req:
-                    sock.send(str.encode( json.dumps(auth_req.dict()) ))
+                    obf_auth_req = rotcipher.obfuscate(json.dumps(auth_req.dict()))
+                    sock.send(str.encode(obf_auth_req))
 
             elif out_msg:
                 text_msg = TextMessage(uname, out_msg, str(datetime.now()))
-                sock.send(str.encode( json.dumps(text_msg.dict()) ))
+                obf_msg = rotcipher.obfuscate(json.dumps(text_msg.dict()))
+                sock.send(str.encode( obf_msg ))
 
             print(prompt_txt, end="")
 

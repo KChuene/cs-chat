@@ -1,6 +1,7 @@
 import socket
 import threading
 import json
+import rotcipher
 
 from svr_model import *
 from pathlib import Path
@@ -16,10 +17,10 @@ def close_conn(sock : socket.SocketType):
             connections.remove(conn)
 
 def check_authfile(uname : str, pword : str):
-    if not Path("../data/.authfile").exists():
+    if not Path("./data/.authfile").exists():
         return False, "Cannot authenticate at the moment."
 
-    with open("../data/.authfile", "r") as authfile:
+    with open("./data/.authfile", "r") as authfile:
         line = authfile.readline()
         
         while line: # Ignore newline char
@@ -47,17 +48,20 @@ def update_auth_status(sock : socket.SocketType, is_auth: bool):
 def auth(conn : socket.SocketType, req : dict):
     if not req.get("uname") or not req.get("pword"):
         status = AuthStatus(False, "Incomplete authentication request.")
-        conn.send(str.encode( json.dumps(status.dict()) ))
+        obf_status = rotcipher.obfuscate(json.dumps(status.dict()))
+        conn.send(str.encode(obf_status))
         return
 
     authentic, res_msg = check_authfile(uname= req.get("uname"), pword= req.get("pword"))
     if authentic:
         update_auth_status(conn, True)
         status = AuthStatus(True, res_msg)
-        conn.send(str.encode( json.dumps(status.dict()) ))
+        obf_status = rotcipher.obfuscate(json.dumps(status.dict()))
+        conn.send(str.encode(obf_status))
     else:
         status = AuthStatus(False, res_msg)
-        conn.send(str.encode( json.dumps(status.dict()) ))
+        obf_status = rotcipher.obfuscate( json.dumps(status.dict()) )
+        conn.send(str.encode(obf_status))
     
 
 def is_auth_req(msg_obj : dict):
@@ -92,7 +96,8 @@ def recv_msgs(conn : socket.SocketType):
             print(f"[i] New message from {remote}.")
             print(msg.decode("utf-8"))
 
-            jsonObj = json.loads(msg)
+            deo_msg = rotcipher.deobfuscate(msg.decode("utf-8"))
+            jsonObj = json.loads(deo_msg)
             if is_auth_req(jsonObj):
                 auth(conn, jsonObj)
 
@@ -100,7 +105,8 @@ def recv_msgs(conn : socket.SocketType):
                 forward(conn, msg)
             else:
                 status = AuthStatus(False, "Not authenticated.")
-                conn.send(str.encode( json.dumps(status.dict()) ))
+                obf_status = rotcipher.obfuscate(json.dumps(status.dict()))
+                conn.send(str.encode(obf_status))
         
         except ConnectionResetError:
             print(f"[!] {remote} disconnected.")
@@ -126,7 +132,10 @@ def listen(host : str, port :int):
 
         if len(connections) >= max_conns:
             status = AuthStatus(False, "Channel is full. Try again later.")
-            new_conn.send(json.dumps(status.dict()))
+
+            obf_status = rotcipher.obfuscate(json.dumps(status.dict()))
+            new_conn.send(str.encode(obf_status))
+
             close_conn(new_conn)
             continue
 

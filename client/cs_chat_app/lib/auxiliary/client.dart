@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cs_chat_app/auxiliary/messenger.dart';
+import 'package:cs_chat_app/auxiliary/rotcipher.dart';
 import 'package:cs_chat_app/model/message.dart';
 
 class Client {
@@ -22,7 +23,8 @@ class Client {
 
     socket?.listen(
       (Uint8List data) async { 
-        Map<String, dynamic> jsonObj = json.decode(String.fromCharCodes(data));
+        String jsonStr = ROT.deobfuscate(String.fromCharCodes(data));
+        Map<String, dynamic> jsonObj = json.decode(jsonStr);
         
         messenger.handleMessage(jsonObj);
       },
@@ -44,11 +46,13 @@ class Client {
 
   void auth(AuthRequest request) {
     AuthStatus.isReceived = false;
-    socket?.write(json.encode(request.toJson()));
+    String obfRequest = ROT.obfuscate( json.encode(request.toJson()) ); 
+    socket?.write(obfRequest);
   }
 
   void send(TextMessage msg) async {
-    socket?.write(json.encode(msg.toJson()));
+    String obfMsg = ROT.obfuscate( json.encode(msg.toJson()) );
+    socket?.write(obfMsg);
   }
 
   void disconnect() {
