@@ -28,14 +28,20 @@
         $handle = fopen("./data/.registerkeys", "r");
 
         $authorized = false;
+        $writeback_keys = [];
         $line = trim(fgets($handle));
         while($line) {
             if($key == $line) {
                 $authorized = true;
-                break;
             }
+            else {
+                $writeback_keys[] = $line;
+            }
+
             $line = trim(fgets($handle));
         }
+        fclose($handle);
+        writeback($writeback_keys);
 
         if($authorized) {
             include("register.form.html");
@@ -45,6 +51,14 @@
                 <h1> Forbidden </h1>
                 <h3> Provided Key is Not Unauthorized </h3>
             ";
+        }
+
+        function writeback(array $keys) {
+            $handle = fopen("./data/.registerkeys", "w");
+            foreach($keys as $key) {
+                fwrite($handle, $key."\n");
+            }
+            fclose($handle);
         }
     ?>
     </center>
