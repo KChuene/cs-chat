@@ -201,6 +201,11 @@ class _LoginScreenState extends State<LoginScreen> implements MessengerSubscribe
       }
       else {
         _showAuthError(AuthStatus.text);
+
+        Messenger messenger = Messenger.getInstance();
+        if(!messenger.connected()) {
+          _showConnectStatus(1, "Not connected");
+        }
       }
     }
   }

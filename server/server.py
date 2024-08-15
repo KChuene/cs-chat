@@ -3,6 +3,7 @@ import threading
 import json
 import rotcipher
 import sys
+import traceback
 
 from svr_model import *
 from pathlib import Path
@@ -49,8 +50,8 @@ def check_authfile(uname : str, pword : str):
     if not Path(authfile).exists():
         return False, "Cannot authenticate at the moment."
 
-    with open(authfile, "r") as authfile:
-        line = authfile.readline()
+    with open(authfile, "r") as af:
+        line = af.readline()
         
         while line: # Ignore newline char
             creds = line.replace("\n", "").split(":")
@@ -60,7 +61,7 @@ def check_authfile(uname : str, pword : str):
             elif creds[0] == uname and creds[1] == pword:
                 return True, "Welcome!"
             
-            line = authfile.readline()
+            line = af.readline()
         
         return False, "Invalid username or password."
 
@@ -143,6 +144,7 @@ def recv_msgs(conn : socket.SocketType):
             close_conn(conn)
 
         except Exception as e:
+            traceback.print_exc()
             print(f"[!] Receiving from {remote} failed. {e}")
             cont_to_listen = False
             close_conn(conn)
@@ -181,7 +183,7 @@ authfile = "./data/.authfile"
 if __name__=="__main__":
     host = "0.0.0.0"
     port = 178
-    #authfile = safe_read(sys.argv, "-af")
+    authfile = safe_read(sys.argv, "-af")
 
     try: 
         listen(host, port)

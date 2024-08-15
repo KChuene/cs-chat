@@ -23,6 +23,8 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
 
   @override
   void initState() {
+    Messenger messenger = Messenger.getInstance();
+    messenger.subscribe(this);
     super.initState();
   }
 
@@ -123,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
   void addMessage() async {
     Messenger messenger = Messenger.getInstance();
 
-    if(messageEditController.text.trim().isNotEmpty && messenger.connected()) {
+    if(messageEditController.text.trim().isNotEmpty) {
       TextMessage message = TextMessage(
         type: MsgType.normal,
         sender: AuthStatus.uname,
@@ -132,8 +134,6 @@ class _ChatScreenState extends State<ChatScreen> implements MessengerSubscriber 
         isFromMe: true
       );
 
-      
-      messenger.subscribe(this);
       messenger.send(message);
       setState(() {
         messages.add(message);
