@@ -189,5 +189,3 @@ if __name__=="__main__":
         listen(host, port)
     except KeyboardInterrupt:
         exit()
-
-# TODO: Messages like <AUTH>.akdald.adkalwd. will fail because of ending dot(.)
