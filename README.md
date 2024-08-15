@@ -18,7 +18,7 @@ php invite.php -len 20
 ```
 ## Step 1
 Windows: Extract and run cs_chat_app.exe from builds/windows.zip
-Android: Install cschat-release.apk and run the app
+Android: Install builds/android/cschat-release.apk and run the app
 
 ## Step 2
 The first input field in the app is for connecting to the server. Connect to the server at the
