@@ -28,7 +28,7 @@ hosting address, ex. 192.168.1.100:178
 Enter whatever username:password you registerd. If none registered then you can use wiener:peter. 
 ```
 
-## Connect with the `python` Client
+#### Connect with the `python` Client
 ```
 # Run
 python3 client/client.py -svr 1.2.3.4 -p 178
